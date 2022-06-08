@@ -381,8 +381,12 @@ def main():
                     miou += miou_
                     each_iou += each_iou_
 
-
-
+            final_miou = miou / len(train_img_dataset)
+            final_each_iou = each_iou / len(train_img_dataset)
+            print("train mIoU = %.4f (paved-area = %.4f, dirt = %.4f, grass = %.4f, gravel = %.4f, water = %.4f,rocks = %.4f, pool = %.4f, vegetation = %.4f, roof = %.4f, wall = %.4f, window = %.4f, door = %.4f, fence = %.4f, fence-pole = %.4f, person = %.4f, dog = %.4f, car = %.4f, bicyle = %.4f, tree = %.4f, bald-tree = %.4f, ar-marker = %.4f, obstacle = %.4f, conflicting = %.4f)".format(
+                final_each_iou[0], final_each_iou[1], final_each_iou[2], final_each_iou[3], final_each_iou[4], final_each_iou[5], final_each_iou[6], final_each_iou[7], \
+                final_each_iou[8], final_each_iou[9], final_each_iou[10], final_each_iou[11], final_each_iou[12], final_each_iou[13], final_each_iou[14], \
+                final_each_iou[15], final_each_iou[16, final_each_iou[17], final_each_iou[18], final_each_iou[19], final_each_iou[20], final_each_iou[21], final_each_iou[22] ))
 
 
 
