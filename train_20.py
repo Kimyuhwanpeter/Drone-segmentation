@@ -388,7 +388,20 @@ def main():
                 final_each_iou[15], final_each_iou[16], final_each_iou[17], final_each_iou[18], final_each_iou[19], final_each_iou[20], final_each_iou[21], final_each_iou[22]))
 
 
+            output_text.write("Epoch: ")
+            output_text.write(str(epoch))
+            output_text.write("===================================================================")
+            output_text.write("\n")
+            output_text.write("train mIoU: ")
+            output_text.write("%.4f" % (final_miou))
+            output_text.write(" (train each Iou: ")
+            for i in range(FLAGS.total_classes):
+                if i == FLAGS.total_classes - 1:
+                    output_text.write("%.4f)" % (final_each_iou[FLAGS.total_classes - 1]))
+                else:
+                    output_text.write("%.4f, " % (final_each_iou[i]))
 
+           
 
 
 if __name__ == "__main__":
