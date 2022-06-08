@@ -3,6 +3,7 @@ from model_14 import *
 from random import random, shuffle
 from tensorflow.keras import backend as K
 from model_profiler import model_profiler
+from Drone_measurement import *
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -352,6 +353,39 @@ def main():
 
                         plt.imsave(FLAGS.sample_images + "/{}_batch_{}".format(count, i) + "_label.png", label_mask_color)
                         plt.imsave(FLAGS.sample_images + "/{}_batch_{}".format(count, i) + "_predict.png", pred_mask_color)
+
+                count += 1
+
+            tr_iter = iter(train_ge)
+            miou = 0.
+            each_iou = []
+            for i in range(tr_idx):
+                batch_images, _, batch_labels = next(tr_iter)
+                for j in range(FLAGS.batch_size):
+                    batch_image = tf.expand_dims(batch_images[j], 0)
+                    logits = run_model(model, batch_image, False)
+                    logits = tf.nn.softmax(logits, -1)
+                    logits = tf.argmax(logits, -1)
+                    logits = tf.cast(logits, tf.int32)
+
+                    output_ = logits[0, :, :]
+                    final_output = output_
+
+                    batch_label = tf.cast(batch_labels[j, :, :, 0], tf.uint8).numpy()
+                    batch_label = tf.cast(batch_label, tf.int32)
+
+                    miou_, each_iou_ = Measurement(predict=final_output,
+                                       label=batch_label,
+                                       shape=[FLAGS.img_size*FLAGS.img_size,],
+                                       total_classes=FLAGS.total_classes).MIOU()
+                    miou += miou_
+                    each_iou += each_iou_
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
