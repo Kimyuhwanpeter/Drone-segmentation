@@ -64,6 +64,13 @@ FLAGS = easydict.EasyDict({"img_size": 512,
                            "train": True})
 # void label is 0 --> 1클래스를 0으로 당겨서시작하자 (원래 0 classs는 무시)
 optim = tf.keras.optimizers.Adam(FLAGS.lr)
+labels_color_map = np.array([[0, 0, 0],[128, 64, 128],[130, 76, 0],[0, 102, 0],[112, 103, 87],
+                      [28, 42, 168],[48, 41, 30],[0, 50, 89],[107, 142, 35],
+                      [70, 70, 70],[102, 102, 156],[254, 228, 12],[254, 148, 12],
+                      [190, 153, 153],[153, 153, 153],[255, 22, 96],[102, 51, 0],
+                      [9, 143, 150],[119, 11, 32],[51, 51, 0],[190, 250, 190],
+                      [112, 150, 146],[2, 135, 115],[255, 0, 0]], np.uint8)
+
 color_map = np.array([[128, 64, 128],[130, 76, 0],[0, 102, 0],[112, 103, 87],
                       [28, 42, 168],[48, 41, 30],[0, 50, 89],[107, 142, 35],
                       [70, 70, 70],[102, 102, 156],[254, 228, 12],[254, 148, 12],
@@ -273,7 +280,7 @@ def main():
     if FLAGS.train:
         count = 0
 
-        #output_text = open(FLAGS.save_print, "w")
+        output_text = open(FLAGS.save_print, "w")
         
         train_list = np.loadtxt(FLAGS.train_txt_path, dtype="<U200", skiprows=0, usecols=0)
         test_list = np.loadtxt(FLAGS.test_txt_path, dtype="<U200", skiprows=0, usecols=0)
@@ -327,7 +334,24 @@ def main():
 
                 loss = cal_loss(model, batch_images, batch_labels, object_buf)
 
-                
+                if count % 10 == 0:
+                    print("Epochs: {}, Loss = {} [{}/{}]".format(epoch, loss, step + 1, tr_idx))
+
+                if count % 100 == 0:
+                    logits = run_model(model, batch_images, False)
+                    logits = tf.nn.softmax(logits, -1)
+                    logits = tf.argmax(logits, -1)
+                    logits = tf.cast(logits, tf.int32)
+                    for i in range(FLAGS.batch_size):
+                        label = tf.cast(batch_labels[i, :, :, 0], tf.int32).numpy()
+                        output_ = logits[i, :, :]
+                        final_output = output_
+
+                        pred_mask_color = color_map[final_output]
+                        label_mask_color = labels_color_map[label]
+
+                        plt.imsave(FLAGS.sample_images + "/{}_batch_{}".format(count, i) + "_label.png", label_mask_color)
+                        plt.imsave(FLAGS.sample_images + "/{}_batch_{}".format(count, i) + "_predict.png", pred_mask_color)
 
 
 if __name__ == "__main__":
