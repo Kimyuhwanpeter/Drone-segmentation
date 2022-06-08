@@ -12,23 +12,23 @@ import os
 
 FLAGS = easydict.EasyDict({"img_size": 512,
 
-                           "train_txt_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/train.txt",
+                           "train_txt_path": "/content/train.txt",
 
-                           "test_txt_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/test.txt",
+                           "test_txt_path": "/content/test.txt",
 
-                           "val_txt_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/val.txt",
+                           "val_txt_path": "/content/val.txt",
                            
-                           "tr_label_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/label_images_semantic/",
+                           "tr_label_path": "/content/label_images_semantic/",
                            
-                           "tr_image_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/original_images/",
+                           "tr_image_path": "/content/original_images/",
 
-                           "te_label_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/label_images_semantic/",
+                           "te_label_path": "/content/label_images_semantic/",
                            
-                           "te_image_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/original_images/",
+                           "te_image_path": "/content/original_images/",
 
-                           "val_label_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/label_images_semantic/",
+                           "val_label_path": "/content/label_images_semantic/",
                            
-                           "val_image_path": "D:/[1]DB/[5]4th_paper_DB/Drone/archive/dataset/semantic_drone_dataset/original_images/",
+                           "val_image_path": "/content/original_images/",
                            
                            "pre_checkpoint": False,
                            
@@ -46,11 +46,11 @@ FLAGS = easydict.EasyDict({"img_size": 512,
 
                            "batch_size": 2,
 
-                           "sample_images": "/yuhwan/Edisk/yuhwan/Edisk/Segmentation/6th_paper/proposed_method/Apple_A/sample_images",
+                           "sample_images": "/content/drive/MyDrive/6th_paper/drone_sample_images",
 
-                           "save_checkpoint": "/yuhwan/Edisk/yuhwan/Edisk/Segmentation/6th_paper/proposed_method/Apple_A/checkpoint",
+                           "save_checkpoint": "/content/drive/MyDrive/6th_paper/drone_checkpoint",
 
-                           "save_print": "/yuhwan/Edisk/yuhwan/Edisk/Segmentation/6th_paper/proposed_method/Apple_A/train_out.txt",
+                           "save_print": "/content/drive/MyDrive/6th_paper/drone_train_out.txt",
 
                            "train_loss_graphs": "/yuwhan/Edisk/yuwhan/Edisk/Segmentation/V2/BoniRob/train_loss.txt",
 
@@ -332,7 +332,7 @@ def main():
 
             tr_iter = iter(train_ge)
             miou = 0.
-            each_iou = []
+            each_iou = 0.
             for i in range(tr_idx):
                 batch_images, _, batch_labels = next(tr_iter)
                 for j in range(FLAGS.batch_size):
@@ -383,7 +383,7 @@ def main():
 
             val_iter = iter(val_ge)
             miou = 0.
-            each_iou = []
+            each_iou = 0.
             for i in range(len(val_img_dataset)):
                 batch_images, batch_labels = next(val_iter)
                 logits = run_model(model, batch_images, False)
@@ -428,7 +428,7 @@ def main():
 
             test_iter = iter(test_ge)
             miou = 0.
-            each_iou = []
+            each_iou = 0.
             for i in range(len(test_img_dataset)):
                 batch_images, batch_labels = next(test_iter)
                 logits = run_model(model, batch_images, False)
