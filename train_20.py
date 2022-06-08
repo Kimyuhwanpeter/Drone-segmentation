@@ -387,7 +387,6 @@ def main():
                 final_each_iou[8], final_each_iou[9], final_each_iou[10], final_each_iou[11], final_each_iou[12], final_each_iou[13], final_each_iou[14], \
                 final_each_iou[15], final_each_iou[16], final_each_iou[17], final_each_iou[18], final_each_iou[19], final_each_iou[20], final_each_iou[21], final_each_iou[22]))
 
-
             output_text.write("Epoch: ")
             output_text.write(str(epoch))
             output_text.write("===================================================================")
@@ -400,9 +399,108 @@ def main():
                     output_text.write("%.4f)" % (final_each_iou[FLAGS.total_classes - 1]))
                 else:
                     output_text.write("%.4f, " % (final_each_iou[i]))
+            output_text.write("\n")
 
-           
 
+            val_ge = tf.data.Dataset.from_tensor_slices((val_img_dataset, val_lab_dataset))
+            val_ge = val_ge.map(test_func)
+            val_ge = val_ge.batch(1)
+            val_ge = val_ge.prefetch(tf.data.experimental.AUTOTUNE)
+
+            val_iter = iter(val_ge)
+            miou = 0.
+            each_iou = []
+            for i in range(len(val_img_dataset)):
+                batch_images, batch_labels = next(val_iter)
+                logits = run_model(model, batch_images, False)
+                logits = tf.nn.softmax(logits, -1)
+                logits = tf.argmax(logits, -1)
+                logits = tf.cast(logits, tf.int32)
+
+                output_ = logits[0, :, :]
+                final_output = output_
+
+                batch_label = tf.cast(batch_labels[0, :, :, 0], tf.uint8).numpy()
+                batch_label = tf.cast(batch_label, tf.int32)
+
+                miou_, each_iou_ = Measurement(predict=final_output,
+                                    label=batch_label,
+                                    shape=[FLAGS.img_size*FLAGS.img_size,],
+                                    total_classes=FLAGS.total_classes).MIOU()
+                miou += miou_
+                each_iou += each_iou_
+
+            final_miou = miou / len(val_img_dataset)
+            final_each_iou = each_iou / len(val_img_dataset)
+            print("val mIoU = %.4f (paved-area = %.4f, dirt = %.4f, grass = %.4f, gravel = %.4f, water = %.4f,rocks = %.4f, pool = %.4f, vegetation = %.4f, roof = %.4f, wall = %.4f, window = %.4f, door = %.4f, fence = %.4f, fence-pole = %.4f, person = %.4f, dog = %.4f, car = %.4f, bicyle = %.4f, tree = %.4f, bald-tree = %.4f, ar-marker = %.4f, obstacle = %.4f, conflicting = %.4f)".format(final_miou, final_each_iou[0], final_each_iou[1], final_each_iou[2], final_each_iou[3], final_each_iou[4], final_each_iou[5], final_each_iou[6], final_each_iou[7], \
+                final_each_iou[8], final_each_iou[9], final_each_iou[10], final_each_iou[11], final_each_iou[12], final_each_iou[13], final_each_iou[14], \
+                final_each_iou[15], final_each_iou[16], final_each_iou[17], final_each_iou[18], final_each_iou[19], final_each_iou[20], final_each_iou[21], final_each_iou[22]))
+
+            output_text.write("val mIoU: ")
+            output_text.write("%.4f" % (final_miou))
+            output_text.write(" (val each Iou: ")
+            for i in range(FLAGS.total_classes):
+                if i == FLAGS.total_classes - 1:
+                    output_text.write("%.4f)" % (final_each_iou[FLAGS.total_classes - 1]))
+                else:
+                    output_text.write("%.4f, " % (final_each_iou[i]))
+            output_text.write("\n")
+
+
+            test_ge = tf.data.Dataset.from_tensor_slices((test_img_dataset, test_lab_dataset))
+            test_ge = test_ge.map(test_func)
+            test_ge = test_ge.batch(1)
+            test_ge = test_ge.prefetch(tf.data.experimental.AUTOTUNE)
+
+            test_iter = iter(test_ge)
+            miou = 0.
+            each_iou = []
+            for i in range(len(test_img_dataset)):
+                batch_images, batch_labels = next(test_iter)
+                logits = run_model(model, batch_images, False)
+                logits = tf.nn.softmax(logits, -1)
+                logits = tf.argmax(logits, -1)
+                logits = tf.cast(logits, tf.int32)
+
+                output_ = logits[0, :, :]
+                final_output = output_
+
+                batch_label = tf.cast(batch_labels[0, :, :, 0], tf.uint8).numpy()
+                batch_label = tf.cast(batch_label, tf.int32)
+
+                miou_, each_iou_ = Measurement(predict=final_output,
+                                    label=batch_label,
+                                    shape=[FLAGS.img_size*FLAGS.img_size,],
+                                    total_classes=FLAGS.total_classes).MIOU()
+                miou += miou_
+                each_iou += each_iou_
+
+            final_miou = miou / len(test_img_dataset)
+            final_each_iou = each_iou / len(test_img_dataset)
+            print("test mIoU = %.4f (paved-area = %.4f, dirt = %.4f, grass = %.4f, gravel = %.4f, water = %.4f,rocks = %.4f, pool = %.4f, vegetation = %.4f, roof = %.4f, wall = %.4f, window = %.4f, door = %.4f, fence = %.4f, fence-pole = %.4f, person = %.4f, dog = %.4f, car = %.4f, bicyle = %.4f, tree = %.4f, bald-tree = %.4f, ar-marker = %.4f, obstacle = %.4f, conflicting = %.4f)".format(final_miou, final_each_iou[0], final_each_iou[1], final_each_iou[2], final_each_iou[3], final_each_iou[4], final_each_iou[5], final_each_iou[6], final_each_iou[7], \
+                final_each_iou[8], final_each_iou[9], final_each_iou[10], final_each_iou[11], final_each_iou[12], final_each_iou[13], final_each_iou[14], \
+                final_each_iou[15], final_each_iou[16], final_each_iou[17], final_each_iou[18], final_each_iou[19], final_each_iou[20], final_each_iou[21], final_each_iou[22]))
+
+            output_text.write("test mIoU: ")
+            output_text.write("%.4f" % (final_miou))
+            output_text.write(" (test each Iou: ")
+            for i in range(FLAGS.total_classes):
+                if i == FLAGS.total_classes - 1:
+                    output_text.write("%.4f)" % (final_each_iou[FLAGS.total_classes - 1]))
+                else:
+                    output_text.write("%.4f, " % (final_each_iou[i]))
+            output_text.write("\n")
+            output_text.write("===================================================================")
+            output_text.write("\n")
+            output_text.flush()
+
+            model_dir = "%s/%s" % (FLAGS.save_checkpoint, epoch)
+            if not os.path.isdir(model_dir):
+                print("Make {} folder to store the weight!".format(epoch))
+                os.makedirs(model_dir)
+            ckpt = tf.train.Checkpoint(model=model, optim=optim)
+            ckpt_dir = model_dir + "/drone_model_{}.ckpt".format(epoch)
+            ckpt.save(ckpt_dir)
 
 if __name__ == "__main__":
     main()
