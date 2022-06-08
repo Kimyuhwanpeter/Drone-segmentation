@@ -343,7 +343,7 @@ def main():
                     logits = tf.cast(logits, tf.int32)
 
                     output_ = logits[0, :, :]
-                    final_output = output_
+                    final_output = output_.numpy()
 
                     batch_label = tf.cast(batch_labels[j, :, :, 0], tf.uint8).numpy()
                     batch_label = tf.cast(batch_label, tf.int32)
@@ -392,7 +392,7 @@ def main():
                 logits = tf.cast(logits, tf.int32)
 
                 output_ = logits[0, :, :]
-                final_output = output_
+                final_output = output_.numpy()
 
                 batch_label = tf.cast(batch_labels[0, :, :, 0], tf.uint8).numpy()
                 batch_label = tf.cast(batch_label, tf.int32)
@@ -437,7 +437,7 @@ def main():
                 logits = tf.cast(logits, tf.int32)
 
                 output_ = logits[0, :, :]
-                final_output = output_
+                final_output = output_.numpy()
 
                 batch_label = tf.cast(batch_labels[0, :, :, 0], tf.uint8).numpy()
                 batch_label = tf.cast(batch_label, tf.int32)
