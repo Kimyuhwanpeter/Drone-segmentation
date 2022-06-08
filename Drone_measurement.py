@@ -14,13 +14,14 @@ class Measurement:
 
         self.predict = np.reshape(self.predict, self.shape)
         self.label = np.reshape(self.label, self.shape)
-        label_indices = np.where(self.label != 0)
-        self.label = np.squeeze(np.take(self.label, label_indices), 1)
-        self.predict = np.squeeze(np.take(self.predict, label_indices), 1)
-
+        
+        label_indices = np.where(self.label != 0)[0]    # 0 is void
+        self.label = np.take(self.label, label_indices)
+        self.predict = np.take(self.predict, label_indices)
+        
         predict_count = np.bincount(self.predict, minlength=self.total_classes)
         label_count = np.bincount(self.label, minlength=self.total_classes)
-        label_count_indices = np.where(label_count != 0)
+        label_count_indices = np.where(label_count != 0)[0]
 
         temp = self.total_classes * np.array(self.label, dtype="int") + np.array(self.predict, dtype="int")  # Get category metrics
     
