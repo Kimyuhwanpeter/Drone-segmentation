@@ -1,2 +1,2 @@
 # Drone-segmentation
-* Not complete
+* 실험중
